@@ -3,5 +3,19 @@
     <TargetFrameworks>net472;net481;net6.0;net7.0</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
+    <PackageId>IDP.$(AssemblyName)</PackageId>
+    <Title>idpeople Parsing toolbox</Title>
+    <Company>idpeople A/S</Company>
+    <Product>IDP.$(AssemblyName)</Product>
+    <Copyright>idpeople A/S</Copyright>
+    <PackageReadmeFile></PackageReadmeFile>
+    <RepositoryUrl>https://github.com/idpeople/Parser.Tools</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/idpeople/Parser.Tools</PackageProjectUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 </Project>
