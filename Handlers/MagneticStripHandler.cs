@@ -77,7 +77,11 @@ namespace Parser.Tools.Handlers
             fixedTrack1 = string.Empty;
             if(track1.Length > _maxLengthTrack1) return false;
             track1 = track1.ToUpper();
-            if (IsTrack1Valid(track1)) return true;
+            if (IsTrack1Valid(track1))
+            {
+                fixedTrack1 = track1;
+                return true;
+            }
             var replaceList = new Track1ReplacementList();
             foreach(var ch in track1)
             {
