@@ -8,9 +8,11 @@
     <Company>idpeople A/S</Company>
     <Product>IDP.$(AssemblyName)</Product>
     <Copyright>idpeople A/S</Copyright>
+	<AssemblyVersion>1.0.1</AssemblyVersion>
     <PackageReadmeFile></PackageReadmeFile>
     <RepositoryUrl>https://github.com/idpeople/Parser.Tools</RepositoryUrl>
     <PackageProjectUrl>https://github.com/idpeople/Parser.Tools</PackageProjectUrl>
+    <Version>$(AssemblyVersion)</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Update="README.md">
