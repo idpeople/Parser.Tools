@@ -50,7 +50,7 @@ namespace Parser.Tools.Handlers
         /// <param name="data">String data</param>
         /// <returns><typeparamref name="T"/></returns>
         /// <exception cref="Exception"></exception>
-        public static T GetData<T>(string data)
+        public static T GetData<T>(string data, char[] unWantedChars = null)
             where T : class, new()
         {
             
@@ -95,6 +95,15 @@ namespace Parser.Tools.Handlers
                     continue;
                 }
 
+                if (unWantedChars != null)
+                {
+                    var tmpElement = element;
+                    foreach (var c in unWantedChars)
+                    {
+                        tmpElement = tmpElement.Replace($"{c}", "");
+                    }
+                    element = tmpElement;
+                }
                 f.SetValue(ret, ExtractVal(element, f));
             }
 
@@ -111,7 +120,7 @@ namespace Parser.Tools.Handlers
         /// <returns><typeparamref name="T"/></returns>
         /// <exception cref="Exception"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static T GetData<T>(string[] data, int minNumberOfFields = -1)
+        public static T GetData<T>(string[] data, int minNumberOfFields = -1, char[] unWantedChars=null)
             where T : class, new()
         {
             if(minNumberOfFields > -1)
@@ -134,7 +143,17 @@ namespace Parser.Tools.Handlers
                 {
 
                     var strElement = data[attr.Index].Trim();
+                    if(unWantedChars != null)
+                    {
+                        var tmpElement = strElement;
+                        foreach(var c in unWantedChars)
+                        {
+                            tmpElement = tmpElement.Replace($"{c}", "");
+                        }
+                        strElement = tmpElement;
+                    }
                     object dataVal = ExtractVal(strElement, f);
+
                     f.SetValue(ret, dataVal);
                     continue;
                 }
