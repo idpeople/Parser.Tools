@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Collections.Generic;
 using Parser.Tools.Annotations;
+using System.Threading.Tasks;
 
 namespace Parser.Tools.Handlers
 {
@@ -31,10 +32,41 @@ namespace Parser.Tools.Handlers
             {
                 // Make sure that file contain data
                 if (sr.BaseStream.Length < 1) return ret;
-                
-                var line = string.Empty;
                 if (containHeader) sr.ReadLine();
-                while((line = sr.ReadLine()) != null)
+
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    ret.Add(GetData<T>(line));
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Convert file content to list if objects
+        /// </summary>
+        /// <param name="filePath">Path to data file</param>
+        /// <param name="containHeader">File has a header</param>
+        /// <returns>List of <typeparamref name="T"/></returns>
+        /// <exception cref="FileNotFoundException"/>
+        public static async Task<List<T>> LoadAsync<T>(string filePath, bool containHeader, Encoding encoding = null)
+            where T : class, new()
+        {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"File {filePath} is not found");
+            if (encoding is null) encoding = Encoding.GetEncoding(1252);
+            var ret = new List<T>();
+
+            using (var sr = new StreamReader(filePath, encoding))
+            {
+                // Make sure that file contain data
+                if (sr.BaseStream.Length < 1) return ret;
+                if (containHeader) sr.ReadLine();
+
+                string line;
+                while ((line = await sr.ReadLineAsync()) != null)
                 {
                     ret.Add(GetData<T>(line));
                 }
@@ -50,7 +82,7 @@ namespace Parser.Tools.Handlers
         /// <param name="data">String data</param>
         /// <returns><typeparamref name="T"/></returns>
         /// <exception cref="Exception"></exception>
-        public static T GetData<T>(string data, char[] unWantedChars = null)
+        public static T GetData<T>(string data)
             where T : class, new()
         {
             
@@ -59,7 +91,8 @@ namespace Parser.Tools.Handlers
             {
                 var splitter = (cAttr as DataSplitterAttribute);
                 var arr = data.Split(splitter.Splitter.ToCharArray());
-                return GetData<T>(arr, splitter.MinNumberOfFields);
+                var unWantedChars = splitter.UnwantedChars;
+                return GetData<T>(arr, splitter.MinNumberOfFields, unWantedChars);
             }
 
             var fields = typeof(T).GetProperties().Select(f => f.Name).ToList();
@@ -95,15 +128,6 @@ namespace Parser.Tools.Handlers
                     continue;
                 }
 
-                if (unWantedChars != null)
-                {
-                    var tmpElement = element;
-                    foreach (var c in unWantedChars)
-                    {
-                        tmpElement = tmpElement.Replace($"{c}", "");
-                    }
-                    element = tmpElement;
-                }
                 f.SetValue(ret, ExtractVal(element, f));
             }
 
@@ -143,12 +167,14 @@ namespace Parser.Tools.Handlers
                 {
 
                     var strElement = data[attr.Index].Trim();
+
                     if(unWantedChars != null)
                     {
-                        var tmpElement = strElement;
-                        foreach(var c in unWantedChars)
+                        var tmpElement = string.Empty;
+                        foreach(char c in strElement)
                         {
-                            tmpElement = tmpElement.Replace($"{c}", "");
+                            if (unWantedChars.Contains(c)) continue;
+                            tmpElement+= c;
                         }
                         strElement = tmpElement;
                     }
