@@ -13,9 +13,14 @@ namespace Parser.Tools.Annotations
         /// </summary>
         public int Index { get; private set; }
 
-        public FieldIndexAttribute(int index)
+        /// <summary>
+        /// Unwanted characters
+        /// </summary>
+        public char[] UnwantedChars { get; private set; }
+        public FieldIndexAttribute(int index, char[] unwantedChars=null)
         {
             Index = index;
+            UnwantedChars = unwantedChars;
         }
     }
 }

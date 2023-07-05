@@ -22,12 +22,17 @@ namespace Parser.Tools.Annotations
         /// Trim field on load
         /// </summary>
         public bool Trim { get; private set; }
-
-        public FieldFixedAttribute(int offset, int size, bool trim = false)
+        
+        /// <summary>
+        /// Unwanted characters
+        /// </summary>
+        public char[] UnwantedChars { get; private set; }
+        public FieldFixedAttribute(int offset, int size, bool trim = false, char[] unwantedChars = null)
         {
             Offset = offset;
             Size = size;
             Trim = trim;
+            UnwantedChars = unwantedChars;
         }
     }
 }

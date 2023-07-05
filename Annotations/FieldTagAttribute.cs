@@ -16,11 +16,16 @@ namespace Parser.Tools.Annotations
         /// Data end tag
         /// </summary>
         public string EndTag { get; private set; }
+        /// <summary>
+        /// Unwanted characters
+        /// </summary>
+        public char[] UnwantedChars { get; private set; }
 
-        public FieldTagAttribute(string startTag, string endTag)
+        public FieldTagAttribute(string startTag, string endTag, char[] unwantedChars = null)
         {
             StartTag = startTag;
             EndTag = endTag;
+            UnwantedChars = unwantedChars;
         }
 
     }
