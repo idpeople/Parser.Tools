@@ -85,14 +85,19 @@ namespace Parser.Tools.Handlers
         public static T GetData<T>(string data)
             where T : class, new()
         {
-            
+            var cRemove = Attribute.GetCustomAttributes(typeof(T)).Where(x => x.GetType() == typeof(UnwantedCharsAttribute)).FirstOrDefault();
+            if(cRemove != null)
+            {
+                var remover = (cRemove as UnwantedCharsAttribute);
+                data = RemoveUnwantedChars(data, remover.UnwantedChars);
+            }
+
             var cAttr = Attribute.GetCustomAttributes(typeof(T)).Where(x => x.GetType() == typeof(DataSplitterAttribute)).FirstOrDefault();
             if(cAttr != null)
             {
                 var splitter = (cAttr as DataSplitterAttribute);
                 var arr = data.Split(splitter.Splitter.ToCharArray());
-                var unWantedChars = splitter.UnwantedChars;
-                return GetData<T>(arr, splitter.MinNumberOfFields, unWantedChars);
+                return GetData<T>(arr, splitter.MinNumberOfFields, splitter.UnwantedChars);
             }
 
             var fields = typeof(T).GetProperties().Select(f => f.Name).ToList();
@@ -166,18 +171,7 @@ namespace Parser.Tools.Handlers
                 if (data.Length > attr?.Index)
                 {
 
-                    var strElement = data[attr.Index].Trim();
-
-                    if(unWantedChars != null)
-                    {
-                        var tmpElement = string.Empty;
-                        foreach(char c in strElement)
-                        {
-                            if (unWantedChars.Contains(c)) continue;
-                            tmpElement+= c;
-                        }
-                        strElement = tmpElement;
-                    }
+                    var strElement = RemoveUnwantedChars(data[attr.Index].Trim(), unWantedChars);
                     object dataVal = ExtractVal(strElement, f);
 
                     f.SetValue(ret, dataVal);
@@ -201,8 +195,7 @@ namespace Parser.Tools.Handlers
             if ((attr.Offset + attr.Size) > val.Length)
                 throw new Exception($"Data out of range. Offset: {attr.Offset}, Size {attr.Size}");
             var retVal = val.Substring(attr.Offset, attr.Size);
-            return attr.Trim ? retVal.Trim() : retVal;
-
+            return RemoveUnwantedChars(attr.Trim ? retVal.Trim() : retVal, attr.UnwantedChars);
         }
 
         /// <summary>
@@ -223,7 +216,9 @@ namespace Parser.Tools.Handlers
             var endpos = val.IndexOf(attr.EndTag);
             if (endpos < 0)
                 throw new Exception($"Tag not found {attr.EndTag}");
-            return val.Substring(offset, endpos - offset).Trim();
+            var value = val.Substring(offset, endpos - offset).Trim();
+            
+            return RemoveUnwantedChars(value, attr.UnwantedChars);
         }
 
         /// <summary>
@@ -266,6 +261,25 @@ namespace Parser.Tools.Handlers
                     return Convert.ToByte(val);
                 default: return val;
             }
+        }
+    
+        /// <summary>
+        /// Remove unwanted characters from a string
+        /// </summary>
+        /// <param name="val">Original value</param>
+        /// <param name="unwantedChars">Array of unwanted characters</param>
+        /// <returns>string</returns>
+        private static string RemoveUnwantedChars(string val, char[] unwantedChars)
+        {
+            if (unwantedChars is null) return val;
+
+            var tmpElement = string.Empty;
+            foreach (char c in val)
+            {
+                if (unwantedChars.Contains(c)) continue;
+                tmpElement += c;
+            }
+            return tmpElement;
         }
     }
 }
