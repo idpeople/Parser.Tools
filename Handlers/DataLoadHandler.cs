@@ -89,7 +89,7 @@ namespace Parser.Tools.Handlers
             if(cRemove != null)
             {
                 var remover = (cRemove as UnwantedCharsAttribute);
-                data = RemoveUnwantedChars(data, remover.UnwantedChars);
+                data = RemoveUnwantedChars(data, remover.UnwantedChars, remover.Replacement);
             }
 
             var cAttr = Attribute.GetCustomAttributes(typeof(T)).Where(x => x.GetType() == typeof(DataSplitterAttribute)).FirstOrDefault();
@@ -131,6 +131,16 @@ namespace Parser.Tools.Handlers
                 else
                 {
                     continue;
+                }
+
+                if(attrs.Where(x=> x.GetType() == typeof(UnwantedCharsAttribute)).Any())
+                {
+                    attr = Attribute.GetCustomAttribute(f, typeof(UnwantedCharsAttribute));
+                    if(!(attr is null))
+                    {
+                        var unwanted = attr as UnwantedCharsAttribute;
+                        element = RemoveUnwantedChars(element, unwanted.UnwantedChars, unwanted.Replacement);
+                    }
                 }
 
                 f.SetValue(ret, ExtractVal(element, f));
@@ -269,14 +279,20 @@ namespace Parser.Tools.Handlers
         /// <param name="val">Original value</param>
         /// <param name="unwantedChars">Array of unwanted characters</param>
         /// <returns>string</returns>
-        private static string RemoveUnwantedChars(string val, char[] unwantedChars)
+        private static string RemoveUnwantedChars(string val, char[] unwantedChars, string replacement="")
         {
             if (unwantedChars is null) return val;
-
+            var useReplacement = !string.IsNullOrEmpty(replacement);
             var tmpElement = string.Empty;
             foreach (char c in val)
             {
-                if (unwantedChars.Contains(c)) continue;
+                if (unwantedChars.Contains(c))
+                {
+                    if(useReplacement)
+                        tmpElement += replacement;
+                    continue;
+
+                }
                 tmpElement += c;
             }
             return tmpElement;
