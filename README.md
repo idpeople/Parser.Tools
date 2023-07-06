@@ -38,3 +38,20 @@ This if for selecting data using a start-tag and a end-tag.<br/>
 The attribute is for variables in a class.<br/>
 It is possible to define an array of unwanted characters, that will
 be removed from data before it is returned.
+
+## Handlers
+
+### DataLoadHandler
+
+This handler is for loading data and converting it into class objects
+using the annotation attributes.
+
+### MagneticStripHandler
+
+This handler is for validating and handling magnetic stripe data.<br/>
+
+### BarcodeHandler
+
+This handler is for adding check digits to different types of barcodes.
+
+
