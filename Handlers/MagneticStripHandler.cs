@@ -8,11 +8,12 @@ namespace Parser.Tools.Handlers
     /// </summary>
     public class MagneticStripHandler
     {
-        private const string _AllowedTrack1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !#$%'()*+,-./;:<>=^]\\[\"&_";
+        //private const string _AllowedTrack1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !#$'()*+,-./;:<>=^]\\[\"&_";
+        private const string _AllowedTrack1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 [\\]^_ $()-./,:";
         private const int _maxLengthTrack1 = 76;
-        private const string _AllowedTrack2 = "0123456789:;<=>";
+        private const string _AllowedTrack2 = "0123456789:<=>";
         private const int _maxLengthTrack2 = 37;
-        private const string _AllowedTrack3 = "0123456789:;<=>";
+        private const string _AllowedTrack3 = "0123456789:<=>";
         private const int _maxLengthTrack3 = 104;
 
         /// <summary>
